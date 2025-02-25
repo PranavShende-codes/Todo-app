@@ -2,16 +2,22 @@ import { useState } from "react";
 import "./App.css";
 
 function App() {
-  const [Task, setTask] = useState("");
-  const [Tasks, setTasks] = useState([]);
+  const [task, setTask] = useState("");
+  const [tasks, setTasks] = useState([]);
 
-  function addTask() {
-    if (Task.trim() === "") return;
-    setTasks([...Tasks, Task]);
+  const addTask = () => {
+    if (task.trim() === "") return;
+    setTasks([...tasks, { text: task, completed: false }]);
     setTask("");
-  }
+  };
+  const toggleTaskCompleted = (index) => {
+    console.log("Toggling task:", index); // Debugging line
+    setTasks(
+      tasks.map((t, i) => (i === index ? { ...t, completed: !t.completed } : t))
+    );
+  };
   const removeTask = (index) => {
-    setTasks(Tasks.filter((t, i) => i !== index));
+    setTasks(tasks.filter((t, i) => i !== index));
   };
   return (
     <>
@@ -22,7 +28,7 @@ function App() {
             className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring focus:border-blue-300 "
             type="text"
             placeholder="Type your task"
-            value={Task}
+            value={task}
             onChange={(e) => setTask(e.target.value)}
           />
           <button
@@ -33,18 +39,36 @@ function App() {
           </button>
 
           <ul className="mt-4 ">
-            {Tasks.map((t, index) => (
+            {tasks.map((t, index) => (
               <li
                 key={index}
-                className="bg-gray-200 p-2 rounded-lg mt-2 flex overflow-auto text-gray-800"
+                className={`bg-gray-200 p-2 rounded-lg mt-2 flex overflow-auto ${
+                  t.completed ? "line-through text-gray-500" : "text-gray-800"
+                }`}
               >
-                <div className="flex-1 ">{t}</div>
-                <button
-                  className="bg-red-500 hover:bg-red-600 text-white  py-1 px-2 rounded-lg ml-5 transition-all cursor-pointer "
-                  onClick={() => removeTask(index)}
+
+                <span
+                  className={`flex-1 ${
+                    t.completed ? "text-gray-400" : "text-gray-800"
+                  }`}
                 >
-                  Delete
-                </button>
+                  {t.text}
+                </span>
+                <div>
+                  <input
+                    type="checkbox"
+                    checked={t.completed}
+                    onChange={() => toggleTaskCompleted(index)}
+                    className="cursor-pointer"
+                  />
+
+                  <button
+                    className="bg-red-500 hover:bg-red-600 text-white  py-1 px-2 rounded-lg ml-5 transition-all cursor-pointer "
+                    onClick={() => removeTask(index)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
