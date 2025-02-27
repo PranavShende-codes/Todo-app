@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
   const [task, setTask] = useState("");
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    const storedItems = localStorage.getItem("tasks");
+    return storedItems ? JSON.parse(storedItems) : [];
+  })
 
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
   const addTask = () => {
     if (task.trim() === "") return;
     setTasks([...tasks, { text: task, completed: false }]);
@@ -46,7 +52,6 @@ function App() {
                   t.completed ? "line-through text-gray-500 " : "text-gray-800"
                 } hover:bg-gray-300`}
               >
-
                 <span
                   className={`flex-1 ${
                     t.completed ? "text-gray-400" : "text-gray-800"
