@@ -42,9 +42,9 @@ function App() {
             {tasks.map((t, index) => (
               <li
                 key={index}
-                className={`bg-gray-200 p-2 rounded-lg mt-2 flex overflow-auto ${
-                  t.completed ? "line-through text-gray-500" : "text-gray-800"
-                }`}
+                className={`bg-gray-200 p-3 rounded-lg mt-2 justify-between items-center transition-all duration-300 flex overflow-auto ${
+                  t.completed ? "line-through text-gray-500 " : "text-gray-800"
+                } hover:bg-gray-300`}
               >
 
                 <span
@@ -54,12 +54,12 @@ function App() {
                 >
                   {t.text}
                 </span>
-                <div>
+                <div flex items-center>
                   <input
                     type="checkbox"
                     checked={t.completed}
                     onChange={() => toggleTaskCompleted(index)}
-                    className="cursor-pointer"
+                    className="cursor-pointer accent-green-500 w-5 h-5 mr-3"
                   />
 
                   <button
