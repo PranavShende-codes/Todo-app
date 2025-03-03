@@ -29,16 +29,22 @@ function App() {
   };
 
   const startEdit = (index, text) => {
+    if (editIndex !== null) return;
     setEditIndex(index);
-    setEditText (text);
+    setEditText(text);
   };
 
   const saveEdit = (index) => {
     if (editText.trim() === "") return;
 
-    setTasks(tasks.map((t, i) => (i === index ? { ...t, text: editText } : t)));
-    setEditIndex(null);
-    setEditText("");
+    setTasks((prevTasks) => {
+      const updatedTasks = prevTasks.map((t, i) =>
+        i === index ? { ...t, text: editText } : t
+      );
+      setEditIndex(null);
+      setEditText("");
+      return updatedTasks;
+    });
   };
   return (
     <>
@@ -63,7 +69,12 @@ function App() {
             {tasks.map((t, index) => (
               <li
                 key={index}
-                className={"bg-gray-200 p-3 rounded-lg mt-2 justify-between bg-white shadow-md border items-center transition-all duration-300 flex overflow-auto hover:bg-gray-300 "}
+                className={`bg-gray-200 p-3 rounded-lg mt-2 justify-between bg-white shadow-md border items-center flex overflow-auto hover:bg-gray-300
+    transition-all duration-500 transform ${
+      t.completed
+        ? "line-through text-gray-500 scale-95 opacity-50"
+        : "scale-100 opacity-100"
+    }`}
               >
                 {editIndex === index ? (
                   <input
@@ -72,12 +83,26 @@ function App() {
                     onChange={(e) => setEditText(e.target.value)}
                     className="flex-1 border border-gray-300 rounded-lg p-1"
                     autoFocus
-                    onKeyDown={(e) => e.key === "Enter" && saveEdit(index)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        saveEdit(index);
+                      }
+                      if (e.key === "Escape") {
+                        setEditIndex(null);
+                        setEditText("");
+                      }
+                    }}
                   />
                 ) : (
-                  <span className={`flex-1 px-2 ${
-                  t.completed ? "line-through text-gray-500 " : "text-gray-800"
-                }`}>{t.text}</span>
+                  <span
+                    className={`flex-1 px-2 ${
+                      t.completed
+                        ? "line-through text-gray-500 "
+                        : "text-gray-800"
+                    }`}
+                  >
+                    {t.text}
+                  </span>
                 )}
                 <div className="flex items-center space-x-2">
                   <input
