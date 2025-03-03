@@ -6,7 +6,9 @@ function App() {
   const [tasks, setTasks] = useState(() => {
     const storedItems = localStorage.getItem("tasks");
     return storedItems ? JSON.parse(storedItems) : [];
-  })
+  });
+  const [editIndex, setEditIndex] = useState(null);
+  const [editText, setEditText] = useState("");
 
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -23,7 +25,20 @@ function App() {
     );
   };
   const removeTask = (index) => {
-    setTasks(tasks.filter((t, i) => i !== index));
+    setTasks(tasks.filter((_, i) => i !== index));
+  };
+
+  const startEdit = (index, text) => {
+    setEditIndex(index);
+    setEditText (text);
+  };
+
+  const saveEdit = (index) => {
+    if (editText.trim() === "") return;
+
+    setTasks(tasks.map((t, i) => (i === index ? { ...t, text: editText } : t)));
+    setEditIndex(null);
+    setEditText("");
   };
   return (
     <>
@@ -48,30 +63,49 @@ function App() {
             {tasks.map((t, index) => (
               <li
                 key={index}
-                className={`bg-gray-200 p-3 rounded-lg mt-2 justify-between items-center transition-all duration-300 flex overflow-auto ${
-                  t.completed ? "line-through text-gray-500 " : "text-gray-800"
-                } hover:bg-gray-300`}
+                className={"bg-gray-200 p-3 rounded-lg mt-2 justify-between bg-white shadow-md border items-center transition-all duration-300 flex overflow-auto hover:bg-gray-300 "}
               >
-                <span
-                  className={`flex-1 ${
-                    t.completed ? "text-gray-400" : "text-gray-800"
-                  }`}
-                >
-                  {t.text}
-                </span>
-                <div flex items-center>
+                {editIndex === index ? (
+                  <input
+                    type="text"
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    className="flex-1 border border-gray-300 rounded-lg p-1"
+                    autoFocus
+                    onKeyDown={(e) => e.key === "Enter" && saveEdit(index)}
+                  />
+                ) : (
+                  <span className={`flex-1 px-2 ${
+                  t.completed ? "line-through text-gray-500 " : "text-gray-800"
+                }`}>{t.text}</span>
+                )}
+                <div className="flex items-center space-x-2">
                   <input
                     type="checkbox"
                     checked={t.completed}
                     onChange={() => toggleTaskCompleted(index)}
-                    className="cursor-pointer accent-green-500 w-5 h-5 mr-3"
+                    className="cursor-pointer accent-green-400 w-5 h-5"
                   />
-
+                  {editIndex === index ? (
+                    <button
+                      className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-md transition-all"
+                      onClick={() => saveEdit(index)}
+                    >
+                      ✅
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded-md transition-all"
+                      onClick={() => startEdit(index, t.text)}
+                    >
+                      ✏️
+                    </button>
+                  )}
                   <button
-                    className="bg-red-500 hover:bg-red-600 text-white  py-1 px-2 rounded-lg ml-5 transition-all cursor-pointer "
+                    className="bg-red-500 hover:bg-red-600 text-white  py-1 px-2 rounded-md ml-5 transition-all cursor-pointer"
                     onClick={() => removeTask(index)}
                   >
-                    Delete
+                    Delete 🗑️
                   </button>
                 </div>
               </li>
